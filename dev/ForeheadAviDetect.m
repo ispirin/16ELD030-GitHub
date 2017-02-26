@@ -18,6 +18,7 @@ open(v);
 m1 = 0;
 n1 = 0;
 z1 = 0;
+
 for i = 1:1000
     frame  = read(VID, i);
     

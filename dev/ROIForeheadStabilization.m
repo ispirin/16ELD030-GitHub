@@ -91,7 +91,7 @@ for idx = 1:length(farray(:,:,:))
     imout = farray(:,:,idx);
     Reduced = imresize(imout, [31/5, 150/5]);
     rarray = cat(2, rarray, mean2(imout));
-    %writeVideo(v,imout) 
+    writeVideo(v,imout) 
 end
 close(v);
 release(hVideoOut);
