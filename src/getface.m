@@ -1,76 +1,51 @@
-frames= dir('C:\Users\Igor\Desktop\Frames\*.bmp');  % the folder in which ur images exists
+function getface(sourcedir, destdir, startFrame, endFrame, skip)
+% function getface: parses through a file of frames of human face
+%                    detects and crops out the face box
+%
+% sourcedir  - directory containing frames, format: 
+%              <path>\<frame folder>\*.<extension>
+%
+% destdir    - destination directory to store frames in
+%              <path>\<frame folder>\*.<extension>
+%
+% startFrame - start from a particular frame
+%
+% endFrame   - end with a particular frame
+%
+% skip       - set to "1" to process every frame
+%              otherwise same face box will be used 
+%              for "skip" number of frames
 
-for i = (500) : (520 - 1) % length(frames)
-    filename = strcat('C:\Users\Igor\Desktop\Frames\',frames(i).name);
-    I = imread(filename);
+skipCount = 0;
+
+framesDir = dir(sourcedir); % 'C:\Users\Igor\Desktop\Frames\*.bmp'
+facesDir  = dir(destdir);
+
+detector = vision.CascadeObjectDetector('FrontalFaceCART');
+
+for i = (startFrame) : (endFrame - 1) 
+    filename = fullfile(framesDir(1).folder, framesDir(i).name);
     
-    detector = vision.CascadeObjectDetector('FrontalFaceCART');
+    frame = imread(filename);
     
-    face = step(detector, I);
+    if skipCount == 0 || skipCount == skip
+        skipCount = 0;
+        faceBox = step(detector, frame);
+    end
     
-    imgOut = imcrop(I, face);
+    skipCount = skipCount + 1;
     
-    baseFileName = sprintf('%d.png', k); % e.g. "1.png"
+    try
+        face = imcrop(frame, faceBox);
+    catch       
+        warning('Problem detecting face. Skipping frame %s.', ...
+            framesDir(i).name);
+    end
     
-    fullFileName = fullfile(Resultados, baseFileName); % No need to worry about slashes now!
+    imageName = sprintf('%d.bmp', i);  
     
-    imswrite(I2, fullFileName);
-   
-    figure, imshow(imgOut);
+    fullDistFaces = fullfile(facesDir(1).folder, imageName);
+    
+    imwrite(face, fullDistFaces, 'bmp');
 end
 
-% disp('Creating array...')
-% barray = zeros(1, 1001);
-% farray = [];
-% disp('Arrays created...')
-% disp('Processing frames...')
-% v = VideoWriter('ForeheadSnip.avi');
-% open(v);
-% m1 = 0;
-% n1 = 0;
-% z1 = 0;
-% 
-% for i = 1:1000
-%     frame  = read(VID, i);
-%     
-%     detector = vision.CascadeObjectDetector('FrontalFaceCART');
-%     
-%     face = step(detector, frame);
-%  
-%     forehead = [face(1)+(0.2*face(3)), face(2)*1.3, 0.6*face(3), 0.10*face(3)];
-%     
-%     imgOut = imcrop(frame, forehead);
-% 
-%     barray(i) = mean2(imgOut); 
-%     [m,n,z] = size(imgOut);
-%     imgOut = padarray(imgOut, [300-m, 600-n], 'post');
-%     
-%     if n1 == 0
-%         n1=n;
-%     elseif (n - n1) < 10 && (n - n1) > -10
-%         n1 = n;
-%         writeVideo(v,imgOut)
-%     end
-%     %farray = cat(4, farray, imgOut);  
-% end
-% 
-% figure
-% plot(barray)
-% axis([0, 96, 0, 200])
-% 
-% disp('Frames processed...')
-% disp('Cleaning up noise and creating video...')
-% 
-% for i = 1:1000
-%     check = barray(i+1) - barray(i);
-%     if (check < -20)
-%         barray(i+1) = 0;
-%     end
-% end
-% 
-% barray = barray(barray ~= 0);
-% 
-% close(v);
-% figure
-% plot(barray)
-% axis([0, 96, 0, 200])

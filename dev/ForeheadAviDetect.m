@@ -40,7 +40,7 @@ for i = 1:1000
         n1 = n;
         writeVideo(v,imgOut)
     end
-    %farray = cat(4, farray, imgOut);  
+    %farray = cat(4, farray, imgOut); 
 end
 
 figure
