@@ -1,26 +1,28 @@
-filename = 'ForeheadSnip.avi';
-hVideoSource = vision.VideoFileReader(filename, 'ImageColorSpace', 'Intensity',...
-                                      'VideoOutputDataType', 'double');
+% filename = 'ForeheadSnip.avi';
+% hVideoSource = vision.VideoFileReader(filename, 'ImageColorSpace', 'Intensity',...
+%                                       'VideoOutputDataType', 'double');
 
 hTM = vision.TemplateMatcher('ROIInputPort', true, ...
                             'BestMatchNeighborhoodOutputPort', true);
 
-hVideoOut = vision.VideoPlayer('Name', 'Video Stabilization');
-hVideoOut.Position(1) = round(0.4*hVideoOut.Position(1));
-hVideoOut.Position(2) = round(1.5*(hVideoOut.Position(2)));
-hVideoOut.Position(3:4) = [650 350];
+facesDir = dir('C:\Users\Igor\Desktop\Faces\*.bmp');                        
+                        
+% hVideoOut = vision.VideoPlayer('Name', 'Video Stabilization');
+% hVideoOut.Position(1) = round(0.4*hVideoOut.Position(1));
+% hVideoOut.Position(2) = round(1.5*(hVideoOut.Position(2)));
+% hVideoOut.Position(3:4) = [650 350];
 
 pos.template_orig = [100 15]; % [x y] upper left corner
-pos.template_size = [30 30];  % [width height]
+pos.template_size = [123 123];  % [width height]
 pos.search_border = [0 0];    % max horizontal and vertical displacement
 pos.template_center = floor((pos.template_size-1)/2);
 pos.template_center_pos = (pos.template_orig + pos.template_center - 1);
-fileInfo = info(hVideoSource);
-W = fileInfo.VideoSize(1); % Width in pixels
-H = fileInfo.VideoSize(2); % Height in pixels
+% fileInfo = info(hVideoSource);
+W = 700; %fileInfo.VideoSize(1); % Width in pixels
+H = 700; %fileInfo.VideoSize(2); % Height in pixels
 BorderCols = [1:pos.search_border(1)+4 W-pos.search_border(1)+4:W];
 BorderRows = [1:pos.search_border(2)+4 H-pos.search_border(2)+4:H];
-sz = fileInfo.VideoSize;
+sz = [700, 700]; %fileInfo.VideoSize;
 TargetRowIndices = ...
   pos.template_orig(2)-1:pos.template_orig(2)+pos.template_size(2)-2;
 TargetColIndices = ...
@@ -33,10 +35,13 @@ farray = [];
 rarray = [];
 crsmallest = [Inf, Inf];
 v = VideoWriter('ForeheadStabil.avi','Uncompressed AVI');
+i = 0;
 
 while ~isDone(hVideoSource)
-    imgin = step(hVideoSource);
-    input = imsharpen(imgin,'Radius',2,'Amount',2);
+    i = i + 1;
+    
+    imgin = fullfile(facesDir(1).folder, facesDir(i).name); %step(hVideoSource);
+    input = imread(imgin); %imsharpen(imgin,'Radius',2,'Amount',2);
 
     % Find location of Target in the input video frame
     if firstTime
@@ -74,9 +79,9 @@ while ~isDone(hVideoSource)
     txt = sprintf('(%+05.1f,%+05.1f)', Offset);
     input = insertText(input(:,:,1),[191 215],txt,'FontSize',16, ...
                     'TextColor', 'white', 'BoxOpacity', 0);
-    % figure; imshow(input)
+    figure; imshow(input)
     % Display video
-    step(hVideoOut, [input(:,:,1) Stabilized]);
+    %step(hVideoOut, [input(:,:,1) Stabilized]);
     ROI = imcrop(input(:,:,1), SearchRegionRect);
     farray = cat(3, farray, ROI);
     crsize = [sum(Stabilized(:,4)~=0.0016), sum(input(1,:)~=0.0016)];

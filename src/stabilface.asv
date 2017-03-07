@@ -26,6 +26,7 @@ Offset = [0 0];
 Target = zeros(18,22);
 firstTime = true;
 farray = [];
+O
 crsmallest = [Inf, Inf];
 
 for i = 1 : 40
@@ -53,8 +54,10 @@ for i = 1 : 40
         SearchRegion, Offset, pos);
 
     % Translate video frame to offset the camera motion
-    
-    Stabilized = imtranslate(input, Offset, 'linear');
+    if OffsetPrev ~= Offset
+        Stabilized = imtranslate(input, Offset, 'linear');
+        OffsetPrev = Offset;
+    end
 
     Target = Stabilized(TargetRowIndices, TargetColIndices);
 
@@ -71,7 +74,7 @@ for i = 1 : 40
                     
     % Display the offset (displacement) values on the input image
     txt = sprintf('(%+05.1f,%+05.1f)', Offset);
-    input = insertText(input(:,:,1),[180 215],txt,'FontSize',16, ...
+    Stabilized = insertText(Stabilized(:,:,1),[180 215],txt,'FontSize',16, ...
                     'TextColor', 'white', 'BoxOpacity', 0);
                 
     imshowpair(input, Stabilized, 'montage');
@@ -83,5 +86,5 @@ for i = 1 : 40
     crsize = [sum(Stabilized(:,4)~=0.0016), sum(input(1,:)~=0.0016)];
     if crsmallest(1) > crsize(1); crsmallest(1)=crsize(1); end
     if crsmallest(2) > crsize(2); crsmallest(2)=crsize(2); end
-
+    pause(0.5)
 end
