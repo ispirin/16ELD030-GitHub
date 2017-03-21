@@ -1,0 +1,15 @@
+function [clean, t] = cleanupdata(ippgarray)
+
+meanamp = cumsum(ippgarray))/length(ippgarray)
+
+for i = 1:length(ippgarray)-1
+    check = meanamp - ippgarray(i);
+    if ((check < -1) || (check > 1))
+        ippgarray(i+1) = 0;
+    end
+end
+
+clean = ippgarray(ippgarray ~= 0);
+
+t = 0:(length(clean)/50)/length(clean): ...
+(length(clean)/50)-(length(clean)/50)/length(clean);

@@ -38,8 +38,7 @@ ippgfin = getippg(ippgraw, 50);
 disp('iPPG waveform created...');
 
 %% Calculate heart rate (hr) reading
-bpm = gethr(ippgfin);
-disp('Heart rate calculated...');
+bpm = gethr(ippg
 
 %% Create plot for the generated data
 figure; plot(t, ippgfin);
@@ -49,4 +48,3 @@ ylabel('Avg Intensity')
 xlim([0, max(t)])
 ylim([-3 3])
 disp('Plot created...');
-disp('Done')

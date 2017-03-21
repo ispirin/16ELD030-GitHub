@@ -25,7 +25,6 @@ detector = vision.CascadeObjectDetector('FrontalFaceCART');
 
 for i = (startFrame) : (endFrame - 1) 
     filename = fullfile(framesDir(1).folder, framesDir(i).name);
-    
     frame = imread(filename);
     
     if skipCount == 0 || skipCount == skip
@@ -43,9 +42,7 @@ for i = (startFrame) : (endFrame - 1)
     end
     
     imageName = sprintf('%d.bmp', i);  
-    
     fullDistFaces = fullfile(facesDir(1).folder, imageName);
-    
     imwrite(face, fullDistFaces, 'bmp');
 end
 
